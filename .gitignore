@@ -1,0 +1,24 @@
+# Virtual environment
+venv/
+
+# Python cache
+__pycache__/
+*.pyc
+
+# Audio files
+*.wav
+
+# Whisper / Hugging Face cache
+.cache/
+.cache/huggingface/
+
+# IDE files
+.vscode/
+
+# Operating system files
+.DS_Store
+Thumbs.db
+
+# Local backups and experiments
+app_backup.py
+old_experiments/
