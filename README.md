@@ -2,13 +2,33 @@
 
 ## 1. Project Overview
 
-The Real-Time Multilingual Classroom Translation System is a speech-based translation application designed to help teachers communicate with students who speak different languages.
+The Real-Time Multilingual Classroom Translation System is a speech-based multilingual translation application designed to help teachers communicate with students who speak different languages.
 
-The application captures speech through a microphone, automatically detects when the speaker starts and stops speaking, converts the speech into text using OpenAI Whisper, detects the source language, and translates the resulting text into a selected target language using Meta's NLLB-200 model.
+The application captures classroom speech through a microphone, automatically detects when the speaker starts and stops speaking, converts speech into text using OpenAI Whisper, detects the source language, and translates the resulting text into a selected target language using Meta's NLLB-200 model.
 
 The application is implemented using Python and Streamlit and provides an interactive interface for recording speech, viewing the transcription, viewing the translated output, and maintaining translation history during the current session.
 
-## 2. Problem Statement
+## 2. Application Screenshots
+
+### 2.1 Application Preview
+
+The main application interface provides access to speech recording, target-language selection, and translation.
+
+![Application Preview](assets/preview.png)
+
+### 2.2 Target Language Selection
+
+Users can select the language in which the classroom speech should be translated.
+
+![Target Language Selection](assets/language-selection.png)
+
+### 2.3 Translation Output
+
+After recording, the application displays the original speech, detected source language, translated text, and translation history.
+
+![Translation Output](assets/output.png)
+
+## 3. Problem Statement
 
 In multilingual classrooms, language differences can make communication between teachers and students difficult.
 
@@ -40,21 +60,21 @@ Translated Text
 
 The goal is to provide a simple and automated workflow for classroom speech translation.
 
-## 3. Key Features
+## 4. Key Features
 
-- Automatic speech detection using microphone audio levels
+- Automatic speech detection and recording
 - Automatic recording start when speech is detected
 - Automatic recording stop after a configurable silence period
 - Speech-to-text conversion using OpenAI Whisper
 - Automatic source-language detection
 - Multilingual translation using Meta NLLB-200
-- Support for Hindi, Kannada, Tamil, and Telugu as target languages
+- Support for Hindi, Kannada, Tamil, and Telugu
 - Streamlit-based interactive web interface
-- Translation history within the current application session
-- Cached ML models to avoid repeated model initialization
+- Translation history within the current session
+- Cached ML models for faster repeated requests
 - Modular Python project structure
 
-## 4. System Architecture
+## 5. System Architecture
 
 ```text
                          User
@@ -81,13 +101,13 @@ The goal is to provide a simple and automated workflow for classroom speech tran
                    Language Mapping
                            |
                            v
-                     NLLB-200
+                       NLLB-200
                            |
                            v
-                  Target Language
+                    Target Language
                            |
                            v
-                  Translated Text
+                    Translated Text
                            |
                            v
                     Streamlit UI
@@ -96,7 +116,7 @@ The goal is to provide a simple and automated workflow for classroom speech tran
                  Translation History
 ```
 
-## 5. Technology Stack
+## 6. Technology Stack
 
 | Technology | Purpose |
 |---|---|
@@ -104,14 +124,14 @@ The goal is to provide a simple and automated workflow for classroom speech tran
 | Streamlit | Web-based user interface |
 | OpenAI Whisper | Speech recognition and language detection |
 | NLLB-200 | Multilingual machine translation |
-| Hugging Face Transformers | Loading and running the NLLB model |
+| Hugging Face Transformers | Loading and running NLLB |
 | PyTorch | Deep learning model execution |
 | SoundDevice | Microphone audio capture |
 | NumPy | Numerical and audio signal processing |
-| SciPy | Saving recorded audio as WAV files |
+| SciPy | WAV file creation |
 | FFmpeg | Audio processing required by Whisper |
 
-## 6. Project Structure
+## 7. Project Structure
 
 ```text
 realtime-multilingual-classroom-translation/
@@ -131,9 +151,14 @@ realtime-multilingual-classroom-translation/
 ├── tests/
 |
 ├── assets/
+│   ├── preview.png
+│   ├── language-selection.png
+│   └── output.png
 |
 └── old_experiments/
 ```
+
+## 8. Module Responsibilities
 
 ### `app.py`
 
@@ -161,7 +186,7 @@ When the volume crosses the configured speech threshold, recording begins.
 
 When the speaker stops talking and the audio remains below the threshold for the configured silence duration, recording stops automatically.
 
-Important configuration parameters include:
+Current configuration:
 
 ```python
 SAMPLE_RATE = 16000
@@ -188,29 +213,23 @@ The application currently uses the Whisper `base` model.
 
 Responsible for machine translation.
 
-The module loads:
+The module uses:
 
 ```text
 facebook/nllb-200-distilled-600M
 ```
 
-It accepts:
-
-- Source text
-- Source language
-- Target language
-
-and returns the translated text.
+It accepts the source text, source language, and target language and returns the translated text.
 
 ### `src/language_config.py`
 
-Contains the supported target languages and the mapping between Whisper language codes and NLLB language codes.
+Contains supported languages and mappings between Whisper and NLLB language codes.
 
 Example:
 
 ```text
 Whisper code     NLLB code
---------------------------------
+--------------------------
 en               eng_Latn
 hi               hin_Deva
 kn               kan_Knda
@@ -218,9 +237,7 @@ ta               tam_Taml
 te               tel_Telu
 ```
 
-## 7. Supported Languages
-
-The current version supports the following target languages:
+## 9. Supported Languages
 
 | Language | NLLB Language Code |
 |---|---|
@@ -229,9 +246,9 @@ The current version supports the following target languages:
 | Tamil | `tam_Taml` |
 | Telugu | `tel_Telu` |
 
-The language configuration is separated into its own module so that additional languages can be added without modifying the main application logic.
+The language configuration is separated into its own module so additional languages can be added without modifying the main application logic.
 
-## 8. Application Workflow
+## 10. Application Workflow
 
 ### Step 1: Select Target Language
 
@@ -270,19 +287,6 @@ Transcribed text
 Detected language
 ```
 
-For example:
-
-```text
-Input speech:
-"Good morning students"
-
-Detected language:
-English
-
-Transcription:
-"Good morning students"
-```
-
 ### Step 7: Map Language Codes
 
 Whisper and NLLB use different language-code formats.
@@ -303,14 +307,11 @@ eng_Latn
 
 The transcription is passed to NLLB along with the source and target language codes.
 
-For example:
+Example:
 
 ```text
-Source:
-English
-
-Target:
-Kannada
+Source: English
+Target: Kannada
 
 Input:
 Good morning students
@@ -328,13 +329,11 @@ The Streamlit interface displays:
 - Translated text
 - Translation history
 
-## 9. Performance Optimization
+## 11. Performance Optimization
 
-One of the important optimization considerations in this project is ML model initialization.
+Whisper and NLLB are large machine learning models. Loading these models repeatedly for every user interaction introduces unnecessary overhead.
 
-Whisper and NLLB are large machine learning models. Loading these models repeatedly for every user interaction would introduce significant unnecessary overhead.
-
-The application therefore uses Streamlit's resource caching:
+The application therefore uses Streamlit resource caching:
 
 ```python
 @st.cache_resource
@@ -342,15 +341,13 @@ The application therefore uses Streamlit's resource caching:
 
 The models are loaded once and reused for subsequent interactions.
 
-Conceptually:
-
-```text
 Without caching:
 
+```text
 Request
    |
    v
-Load Whisper
+Load model
    |
    v
 Process audio
@@ -359,15 +356,16 @@ Process audio
 Request again
    |
    v
-Load Whisper again
-
+Load model again
+```
 
 With caching:
 
+```text
 First request
    |
    v
-Load Whisper
+Load model
    |
    v
 Keep model in memory
@@ -379,18 +377,16 @@ Subsequent requests
 Reuse existing model
 ```
 
-This reduces repeated model-loading overhead and improves application responsiveness.
+This reduces repeated model initialization and improves application responsiveness.
 
-## 10. Installation
+## 12. Installation
 
 ### Prerequisites
-
-The following software is required:
 
 - Python 3.x
 - FFmpeg
 - Git
-- A working microphone
+- Working microphone
 
 ### Clone the Repository
 
@@ -399,17 +395,15 @@ git clone <your-github-repository-url>
 cd realtime-multilingual-classroom-translation
 ```
 
-The GitHub repository URL will be added after the repository is created.
-
 ### Create a Virtual Environment
-
-Windows:
 
 ```powershell
 python -m venv venv
 ```
 
-Activate the environment:
+### Activate the Environment
+
+Windows PowerShell:
 
 ```powershell
 venv\Scripts\Activate.ps1
@@ -423,59 +417,55 @@ pip install -r requirements.txt
 
 ### Verify FFmpeg
 
-Run:
-
 ```powershell
 ffmpeg -version
 ```
 
-FFmpeg must be available from the system PATH.
+FFmpeg must be available through the system PATH.
 
-## 11. Running the Application
+## 13. Running the Application
 
-After installing the dependencies, run:
+Run:
 
 ```powershell
 streamlit run app.py
 ```
 
-Streamlit will start a local web server.
+The application will open in a browser.
 
-The application can then be accessed through the local URL displayed in the terminal, typically:
+The default local address is generally:
 
 ```text
 http://localhost:8501
 ```
 
-## 12. Translation History
+## 14. Translation History
 
 The application maintains translation history using Streamlit session state.
 
 Each translation stores:
 
-```text
-Original text
-Translated text
-Detected source language
-Selected target language
-```
+- Original text
+- Translated text
+- Detected source language
+- Selected target language
 
-The history exists for the current application session.
+The history is maintained for the current application session.
 
-A Clear Translation History option is also available in the interface.
+A Clear Translation History option is also available.
 
-## 13. Error Handling
+## 15. Error Handling
 
-The application includes basic validation for common conditions such as:
+The application includes basic validation for:
 
 - No speech detected
 - Empty transcription
 - Unsupported source language
 - Missing translation mapping
 
-For example, if Whisper detects a language that has not been configured for NLLB translation, the application displays an appropriate error instead of attempting the translation.
+If Whisper detects a language that has not been configured for translation, the application displays an error instead of attempting an unsupported translation.
 
-## 14. Design Decisions
+## 16. Design Decisions
 
 ### Why Whisper?
 
@@ -508,25 +498,25 @@ This improves:
 - Debugging
 - Future development
 
-## 15. Current Limitations
+## 17. Current Limitations
 
 The current implementation is a working prototype and has several limitations:
 
 - Translation is processed after recording rather than continuously during speech.
-- Audio is currently stored as a temporary WAV file.
-- The application is designed primarily for local execution.
-- The current voice activity detection approach is based on audio volume thresholds.
-- GPU acceleration has not yet been configured.
+- Audio is temporarily stored as a WAV file.
+- The application is primarily designed for local execution.
+- Current voice activity detection is based on audio-volume thresholds.
+- GPU acceleration has not been configured.
 - Translation history is stored only for the current Streamlit session.
-- The current application does not provide translated speech output.
+- The application does not currently provide translated speech output.
 
-## 16. Future Improvements
+## 18. Future Improvements
 
 Potential improvements include:
 
 1. Implement true streaming speech recognition and translation.
 2. Replace basic volume-based detection with a dedicated Voice Activity Detection model.
-3. Add more Indian and international languages.
+3. Add additional Indian and international languages.
 4. Add text-to-speech output for translated text.
 5. Add persistent translation history using a database.
 6. Add GPU support for faster model inference.
@@ -537,9 +527,9 @@ Potential improvements include:
 11. Add authentication and multi-user classroom support.
 12. Add monitoring and performance metrics.
 
-## 17. Project Status
+## 19. Project Status
 
-Current status: Working Prototype
+**Status: Working Prototype**
 
 The current implementation successfully demonstrates the complete pipeline:
 
@@ -570,6 +560,6 @@ Translation History
 
 The project is structured so that individual components can be independently improved and tested as development continues.
 
-## 18. Author
+## 20. Author
 
 Nomeshwar V
